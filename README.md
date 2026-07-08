@@ -2,6 +2,16 @@
 
 A Dockerized full-stack Todo application built with a React frontend, Node.js backend, and PostgreSQL database.
 
+## About This Project
+
+This is a learning project built to get hands-on experience with:
+
+- **Docker & Docker Compose** — containerizing a multi-service app (client, server, database) with volumes, networks, and healthchecks
+- **PostgreSQL** — running a relational database in a container with persistent storage
+- **Prisma** — schema modeling, migrations, and type-safe database access
+- **Zustand** — lightweight state management on the frontend
+- **Zod** — runtime schema validation for forms and API data
+
 ## Prerequisites
 
 * Docker Desktop
@@ -23,11 +33,7 @@ cd fullstack-todo-app
 
 ## Environment Configuration
 
-This project uses separate environment files for different environments.
-
-### Development
-
-Create or update `.env.development`:
+Create a `.env` file in the project root:
 
 ```env
 COMPOSE_PROJECT_NAME=fullstack-todo-app
@@ -35,48 +41,28 @@ COMPOSE_PROJECT_NAME=fullstack-todo-app
 POSTGRES_USER=your_username
 POSTGRES_PASSWORD=your_password
 POSTGRES_DB=your_database
+
+DATABASE_URL=postgresql://your_username:your_password@postgres:5432/your_database
+
+JWT_SECRET=your_jwt_secret
 ```
 
-Start the development environment:
+Start the app:
 
 ```bash
-docker compose --env-file .env.development up -d
+docker compose up -d --build
 ```
 
-Stop the development environment:
+Stop the app:
 
 ```bash
-docker compose --env-file .env.development down
+docker compose down
 ```
 
-To remove containers and volumes:
+Remove containers and volumes too:
 
 ```bash
-docker compose --env-file .env.development down -v
-```
-
-### Production
-
-Create or update `.env.production` with your production values:
-
-```env
-COMPOSE_PROJECT_NAME=fullstack-todo-app
-
-POSTGRES_USER=your_production_username
-POSTGRES_PASSWORD=your_secure_production_password
-POSTGRES_DB=your_production_database
-```
-
-Start the production environment:
-
-```bash
-docker compose --env-file .env.production up -d
-```
-
-Stop the production environment:
-
-```bash
-docker compose --env-file .env.production down
+docker compose down -v
 ```
 
 ## Useful Commands
