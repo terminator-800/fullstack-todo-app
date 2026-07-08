@@ -17,7 +17,7 @@ docker compose version
 ## Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/terminator-800/fullstack-todo-app.git
 cd fullstack-todo-app
 ```
 
