@@ -33,7 +33,7 @@ cd fullstack-todo-app
 
 ## Environment Configuration
 
-Create a `.env` file in the project root:
+Create a `.env` (or `.env.development`) file in the project root:
 
 ```env
 COMPOSE_PROJECT_NAME=fullstack-todo-app
@@ -47,10 +47,16 @@ DATABASE_URL=postgresql://your_username:your_password@postgres:5432/your_databas
 JWT_SECRET=your_jwt_secret
 ```
 
-Start the app:
+**If using `.env`** (default, no extra flag needed):
 
 ```bash
 docker compose up -d --build
+```
+
+**If using `.env.development`** (or any other custom name), pass it explicitly with `--env-file`:
+
+```bash
+docker compose --env-file .env.development up -d --build
 ```
 
 Stop the app:
@@ -58,6 +64,7 @@ Stop the app:
 ```bash
 docker compose down
 ```
+(add `--env-file .env.development` if that's the file you're using)
 
 Remove containers and volumes too:
 
