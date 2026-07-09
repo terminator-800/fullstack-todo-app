@@ -37,14 +37,12 @@ Create a `.env` (or `.env.development`) file in the project root:
 
 ```env
 COMPOSE_PROJECT_NAME=fullstack-todo-app
-
 POSTGRES_USER=your_username
 POSTGRES_PASSWORD=your_password
 POSTGRES_DB=your_database
-
 DATABASE_URL=postgresql://your_username:your_password@postgres:5432/your_database
-
 JWT_SECRET=your_jwt_secret
+PORT=5000
 ```
 
 **If using `.env`** (default, no extra flag needed):
@@ -57,6 +55,19 @@ docker compose up -d --build
 
 ```bash
 docker compose --env-file .env.development up -d --build
+```
+
+Once running, the app is available at:
+
+- Client: http://localhost:5173
+- Server API: http://localhost:5000
+
+## First-Time Setup: Run Database Migrations
+
+The first time you start the app, the database will be empty — no tables exist yet. Run this once to create them:
+
+```bash
+docker compose --env-file .env.development exec server npx prisma migrate dev --name init
 ```
 
 Stop the app:
@@ -110,9 +121,9 @@ Whenever you change `server/prisma/schema.prisma` (adding/removing models, field
 
 Create and apply a new migration:
 
-\`\`\`bash
+```bash
 docker compose --env-file .env.development exec server npx prisma migrate dev --name describe_your_change
-\`\`\`
+```
 
 Replace `describe_your_change` with a short description of what changed (e.g. `add_due_date_to_todo`).
 
