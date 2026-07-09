@@ -103,3 +103,17 @@ List Docker networks:
 ```bash
 docker network ls
 ```
+
+## Database Migrations
+
+Whenever you change `server/prisma/schema.prisma` (adding/removing models, fields, or constraints), you need to run a migration to apply those changes to the database.
+
+Create and apply a new migration:
+
+\`\`\`bash
+docker compose --env-file .env.development exec server npx prisma migrate dev --name describe_your_change
+\`\`\`
+
+Replace `describe_your_change` with a short description of what changed (e.g. `add_due_date_to_todo`).
+
+You do **not** need to run this for normal app development — only when the schema itself changes.
