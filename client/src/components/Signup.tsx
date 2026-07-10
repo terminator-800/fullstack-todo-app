@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../api/axios";
 import { signupSchema, type SignupFormValues } from "../schemas/authSchema";
 import { useAuth } from "../store/auth";
 
@@ -50,9 +51,7 @@ export default function Signup() {
 
   const onSubmit = async (data: SignupFormValues) => {
     try {
-      const res = await axios.post("/signup", data, {
-        withCredentials: true,
-      });
+      const res = await api.post("/signup", data);
       const { user } = res.data;
 
       login(user);
