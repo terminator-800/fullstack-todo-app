@@ -14,7 +14,7 @@ const loginContent = {
   },
   heading: {
     title: "Welcome back",
-    subtitle: "Log in to pick up your task ledger where you left off.",
+    subtitle: "Log in to pick up your todo's where you left off.",
   },
   form: {
     emailLabel: "EMAIL",
