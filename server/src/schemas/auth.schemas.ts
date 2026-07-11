@@ -7,4 +7,10 @@ export const signupSchema = z.object({
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+export const verifyEmailSchema = z.object({
+  email: z.string().email("Enter a valid email address"),
+  code: z.string().length(4, "Code must be 4 digits"),
+});
+
 export type SignupInput = z.infer<typeof signupSchema>;
+export type VerifyEmailInput = z.infer<typeof verifyEmailSchema>;
