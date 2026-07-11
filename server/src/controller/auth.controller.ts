@@ -3,7 +3,7 @@ import type { Request, Response } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import prisma from "../config/db";
-import { signupSchema, verifyEmailSchema } from "../schemas/auth.schemas";
+import { signupSchema, verifyEmailSchema, loginSchema } from "../schemas/auth.schemas";
 import { fromError } from "zod-validation-error";
 import { sendVerificationEmail } from "../service/mail.service";
 
@@ -88,7 +88,7 @@ export class AuthController {
       }
 
       if (user.isVerified) {
-        return res.status(400).json({ message: "This account is already verified" });
+        return res.status(409).json({ message: "This email is already verified. Try logging in instead." });
       }
 
       if (user.verificationCode !== code) {
@@ -148,6 +148,51 @@ export class AuthController {
       return res.status(200).json({ message: "Verification code resent" });
     } catch (error) {
       console.error("Resend code error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
+
+  async login(req: Request, res: Response) {
+    const parsed = loginSchema.safeParse(req.body);
+ 
+    if (!parsed.success) {
+      const validationError = fromError(parsed.error);
+      return res.status(400).json({ message: validationError.toString() });
+    }
+ 
+    const { email, password } = parsed.data;
+ 
+    try {
+      const user = await prisma.user.findUnique({ where: { email } });
+ 
+      if (!user) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+ 
+      const passwordMatches = await bcrypt.compare(password, user.password);
+ 
+      if (!passwordMatches) {
+        return res.status(401).json({ message: "Invalid email or password" });
+      }
+ 
+      if (!user.isVerified) {
+        return res.status(403).json({
+          message: "Please verify your email before logging in",
+          email: user.email,
+        });
+      }
+ 
+      this.issueAuthCookie(res, user.id, user.email);
+ 
+      return res.status(200).json({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      console.error("Login error:", error);
       return res.status(500).json({ message: "Something went wrong. Try again." });
     }
   }
