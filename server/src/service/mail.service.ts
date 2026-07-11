@@ -1,3 +1,4 @@
+// src/service/mail.service.ts
 import { BrevoClient } from '@getbrevo/brevo';
 import "dotenv/config";
 
@@ -7,14 +8,14 @@ const brevo = new BrevoClient({
   maxRetries: 3,
 });
 
-export async function sendEmail(to: string, name: string) {
+export async function sendVerificationEmail(to: string, name: string, code: string) {
   const result = await brevo.transactionalEmails.sendTransacEmail({
-    subject: 'Hello from Brevo!',
-    htmlContent: `<html><body><p>Hello ${name},</p><p>This is my first transactional email.</p></body></html>`,
-    sender: { name: 'Alex from Brevo', email: 'hello@brevo.com' },
+    subject: 'Verify your email',
+    htmlContent: `<html><body><p>Hello ${name},</p><p>Your verification code is: <strong>${code}</strong></p></body></html>`,
+    sender: { name: 'Dennese Keith A. Membrano', email: 'dennesekeithmembrano@gmail.com' },
     to: [{ email: to, name }],
   });
-
+ 
   console.log('Email sent. Message ID:', result.messageId);
   return result;
 }
