@@ -5,7 +5,6 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import api from "../api/axios";
 import { signupSchema, type SignupFormValues } from "../schemas/authSchema";
-import { useAuth } from "../store/auth";
 
 // All page text lives here — edit this object to change any copy on the page
 const signupContent = {
@@ -38,7 +37,6 @@ const signupContent = {
 
 export default function Signup() {
   const navigate = useNavigate();
-  const login = useAuth((state) => state.login);
 
   const {
     register,
@@ -51,11 +49,8 @@ export default function Signup() {
 
   const onSubmit = async (data: SignupFormValues) => {
     try {
-      const res = await api.post("/signup", data);
-      const { user } = res.data;
-
-      login(user);
-      navigate("/dashboard");
+      await api.post("/signup", data);
+      navigate("/verify", { state: { email: data.email } });
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 409) {
         setError("email", { message: "An account with this email already exists" });
