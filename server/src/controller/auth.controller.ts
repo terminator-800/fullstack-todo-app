@@ -133,7 +133,7 @@ export class AuthController {
       }
 
       if (user.isVerified) {
-        return res.status(400).json({ message: "This account is already verified" });
+        return res.status(409).json({ message: "This email is already verified. Try logging in instead." });
       }
 
       const verificationCode = this.generateVerificationCode();
