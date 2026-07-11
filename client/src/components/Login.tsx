@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { loginSchema, type LoginFormValues } from "../schemas/authSchema";
 import { useAuth } from "../store/auth";
+import api from "../api/axios";
 
 // All page text lives here — edit this object to change any copy on the page
 const loginContent = {
@@ -56,9 +57,7 @@ export default function Login() {
 
   const onSubmit = async (data: LoginFormValues) => {
     try {
-      const res = await axios.post("/login", data, {
-        withCredentials: true,
-      });
+      const res = await api.post("/login", data);
       const { user } = res.data;
 
       login(user); 
