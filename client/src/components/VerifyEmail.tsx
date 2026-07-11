@@ -1,9 +1,11 @@
 // src/components/VerifyEmail.tsx
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
+import api from "../api/axios";
 import { verifyEmailSchema, type VerifyEmailFormValues } from "../schemas/authSchema";
+import { useAuth } from "../store/auth";
 
 // All page text lives here — edit this object to change any copy on the page
 const verifyEmailContent = {
@@ -35,6 +37,10 @@ const verifyEmailContent = {
 
 export default function VerifyEmail() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const login = useAuth((state) => state.login);
+
+  const emailFromSignup = (location.state as { email?: string } | null)?.email ?? "";
 
   const {
     register,
@@ -44,18 +50,23 @@ export default function VerifyEmail() {
     formState: { errors, isSubmitting },
   } = useForm<VerifyEmailFormValues>({
     resolver: zodResolver(verifyEmailSchema),
+    defaultValues: {
+      email: emailFromSignup,
+    },
   });
 
   const onSubmit = async (data: VerifyEmailFormValues) => {
     try {
-      await axios.post("/verify-email", data, {
-        withCredentials: true,
-      });
+      const res = await api.post("/verify-email", data);
+      const { user } = res.data;
 
-      navigate("/login");
+      login(user);
+      navigate("/dashboard");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 400) {
         setError("code", { message: "Invalid or expired verification code" });
+      } else if (axios.isAxiosError(err) && err.response?.status === 404) {
+        setError("email", { message: "No account found with this email" });
       } else {
         setError("root", { message: "Something went wrong. Try again." });
       }
@@ -71,12 +82,14 @@ export default function VerifyEmail() {
     }
 
     try {
-      await axios.post("/resend-code", { email }, {
-        withCredentials: true,
-      });
+      await api.post("/resend-code", { email });
     } catch (err) {
+    if (axios.isAxiosError(err) && err.response?.data?.message) {
+      setError("root", { message: err.response.data.message });
+    } else {
       setError("root", { message: "Could not resend code. Try again." });
     }
+  }
   };
 
   return (
