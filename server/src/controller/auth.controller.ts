@@ -196,6 +196,34 @@ export class AuthController {
       return res.status(500).json({ message: "Something went wrong. Try again." });
     }
   }
+
+  async me(req: Request, res: Response) {
+    const token = req.cookies?.token;
+ 
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+ 
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string; email: string };
+ 
+      const user = await prisma.user.findUnique({ where: { id: decoded.id } });
+ 
+      if (!user) {
+        return res.status(401).json({ message: "Not authenticated" });
+      }
+ 
+      return res.status(200).json({
+        user: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+        },
+      });
+    } catch (error) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+  }
 }
 
 export const authController = new AuthController();
