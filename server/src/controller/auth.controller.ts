@@ -6,6 +6,7 @@ import prisma from "../config/db";
 import { signupSchema, verifyEmailSchema, loginSchema } from "../schemas/auth.schemas";
 import { fromError } from "zod-validation-error";
 import { sendVerificationEmail } from "../service/mail.service";
+import { Role } from "@prisma/client";
 
 const SALT_ROUNDS = 10;
 
@@ -14,9 +15,9 @@ export class AuthController {
     return Math.floor(1000 + Math.random() * 9000).toString();
   }
 
-  private issueAuthCookie(res: Response, userId: string, email: string) {
+  private issueAuthCookie(res: Response, userId: string, email: string, role: Role) {
     const token = jwt.sign(
-      { id: userId, email },
+      { id: userId, email, role },
       process.env.JWT_SECRET!,
       { expiresIn: "7d" }
     );
@@ -103,13 +104,14 @@ export class AuthController {
         },
       });
 
-      this.issueAuthCookie(res, updatedUser.id, updatedUser.email);
+      this.issueAuthCookie(res, updatedUser.id, updatedUser.email, updatedUser.role);
 
       return res.status(200).json({
         user: {
           id: updatedUser.id,
           name: updatedUser.name,
           email: updatedUser.email,
+          role: updatedUser.role, // NEW: expose role to the frontend
         },
       });
     } catch (error) {
@@ -182,13 +184,14 @@ export class AuthController {
         });
       }
  
-      this.issueAuthCookie(res, user.id, user.email);
+      this.issueAuthCookie(res, user.id, user.email, user.role);
  
       return res.status(200).json({
         user: {
           id: user.id,
           name: user.name,
           email: user.email,
+          role: user.role,
         },
       });
     } catch (error) {
@@ -218,6 +221,7 @@ export class AuthController {
           id: user.id,
           name: user.name,
           email: user.email,
+          role: user.role, 
         },
       });
     } catch (error) {
