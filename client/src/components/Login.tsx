@@ -61,7 +61,7 @@ export default function Login() {
       const { user } = res.data;
 
       login(user); 
-      navigate("/dashboard");
+      navigate("/my-todo");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         setError("password", { message: "Invalid email or password" });

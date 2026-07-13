@@ -61,7 +61,7 @@ export default function VerifyEmail() {
       const { user } = res.data;
 
       login(user);
-      navigate("/dashboard");
+      navigate("/my-todo");
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 400) {
         setError("code", { message: "Invalid or expired verification code" });
