@@ -12,14 +12,21 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
 model User {
-  id        String   @id @default(cuid())
-  name      String
-  email     String   @unique
-  password  String
-  isVerified        Boolean  @default(false)  // NEW: tracks whether the user has verified their email
-  verificationCode  String?    
-  
+  id                String   @id @default(cuid())
+  name              String
+  email             String   @unique
+  password          String
+  role              Role     @default(USER)  
+  isVerified        Boolean  @default(false)
+  verificationCode  String?
+
   todos     Todo[]
 
   createdAt DateTime @default(now())
