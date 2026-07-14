@@ -46,15 +46,15 @@ export default function MyTodoLayout() {
 
   return (
     <div className="flex h-screen bg-slate-100">
-      <Sidebar />
+      {/* <Sidebar /> */}
 
       {/* min-w-0 lets the main column shrink properly inside the flex
           container instead of overflowing when content is wide. */}
       <div className="flex min-w-0 flex-1 flex-col">
-        <Navbar
+        {/* <Navbar
           onBellClick={() => setIsNotifOpen(true)}
           notificationCount={unreadCount}
-        />
+        /> */}
 
         <main className="flex-1 overflow-y-auto p-6">
           {/* Page header */}
@@ -119,11 +119,11 @@ export default function MyTodoLayout() {
         </main>
       </div>
 
-      <NotificationBar
+      {/* <NotificationBar
         isOpen={isNotifOpen}
         onClose={() => setIsNotifOpen(false)}
         notifications={sampleNotifications}
-      />
+      /> */}
     </div>
   );
 }
