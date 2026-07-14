@@ -9,5 +9,6 @@ router.post("/verify-email", authController.verifyEmail.bind(authController));
 router.post("/resend-code", authController.resendCode.bind(authController));
 router.post("/login", authController.login.bind(authController));
 router.get("/me", authController.me.bind(authController));
+router.post("/logout", authController.logout.bind(authController));
 
 export default router;
