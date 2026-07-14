@@ -1,6 +1,7 @@
 // src/components/Sidebar.tsx
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate  } from "react-router-dom";
 import { useAuth } from "../store/auth";
+import api from "../api/axios";
 
 // All page text/icons live here — edit this object to change copy or add nav items
 const sidebarContent = {
@@ -63,15 +64,28 @@ function Icon({ name }: { name: (typeof sidebarContent.navItems)[number]["icon"]
 }
 
 export default function Sidebar() {
+  const navigate = useNavigate();
   const user = useAuth((state) => state.user);
   const logout = useAuth((state) => state.logout);
 
   const initial = user?.name?.charAt(0).toUpperCase() ?? "?";
 
-  const handleLogout = () => {
-    logout();
-    // Navigation after logout is handled by the parent route guard
-    // redirecting unauthenticated users back to /login.
+  const handleLogout = async () => {
+    try {
+      // Call backend logout endpoint to clear cookie
+      await api.post("/logout");
+      
+      // Clear auth state
+      logout();
+      
+      // Redirect to login
+      navigate("/login");
+    } catch (error) {
+      console.error("Logout error:", error);
+      // Even if API call fails, clear local state and redirect
+      logout();
+      navigate("/login");
+    }
   };
 
   return (
