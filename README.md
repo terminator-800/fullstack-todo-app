@@ -43,6 +43,11 @@ POSTGRES_DB=your_database
 DATABASE_URL=postgresql://your_username:your_password@postgres:5432/your_database
 JWT_SECRET=your_jwt_secret
 PORT=5000
+BREVO_API_KEY=your_brevo_api_key
+NODE_ENV=development
+SUPERADMIN_NAME=Super Admin
+SUPERADMIN_EMAIL=your_email@example.com
+SUPERADMIN_PASSWORD=your_strong_password
 ```
 
 **If using `.env`** (default, no extra flag needed):
@@ -128,3 +133,21 @@ docker compose --env-file .env.development exec server npx prisma migrate dev --
 Replace `describe_your_change` with a short description of what changed (e.g. `add_due_date_to_todo`).
 
 You do **not** need to run this for normal app development — only when the schema itself changes.
+
+## Seed the Superadmin Account
+
+After running migrations for the first time, seed the superadmin account:
+
+​```bash
+docker compose --env-file .env.development exec server npm run seed:superadmin
+​```
+
+This creates a superadmin user using the `SUPERADMIN_NAME`, `SUPERADMIN_EMAIL`, and `SUPERADMIN_PASSWORD` values from your `.env` file. Running this command again is safe — it checks if a superadmin already exists and skips creation if so.
+
+Make sure your `.env` (or `.env.development`) includes these three variables before running the seed command:
+
+​```env
+SUPERADMIN_NAME=Super Admin
+SUPERADMIN_EMAIL=your_email@example.com
+SUPERADMIN_PASSWORD=your_strong_password
+​```
