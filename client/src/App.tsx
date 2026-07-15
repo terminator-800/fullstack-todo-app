@@ -16,7 +16,7 @@ export default function App() {
     <BrowserRouter>
       <AuthProvider>
         <Routes>
-          {/* <Route path="/" element={<Navigate to="/my-todo" replace />} /> */}
+          <Route path="/" element={<Navigate to="/my-todo" replace />} />
 
           {/* Public Routes */}
           <Route element={<PublicRoute><Outlet /></PublicRoute>}>
@@ -26,16 +26,20 @@ export default function App() {
             <Route path="/verify" element={<VerifyEmail />} />
           </Route>
 
-          {/* Protected Routes - Regular Users & Admins */}
-          <Route element={<ProtectedRoute><DashboardLayout /></ProtectedRoute>}>
+          {/* Protected Routes - Regular Users only */}
+          <Route 
+            element={
+              <ProtectedRoute>
+                <RoleRoute allowedRoles={["USER"]}>
+                  <DashboardLayout />
+                </RoleRoute>
+              </ProtectedRoute>
+            }
+          >
             <Route path="/my-todo" element={<MyTodoLayout />} />
-            {/* <Route path="/archive" element={<Archive />} />
-            <Route path="/trash" element={<Trash />} />
-            <Route path="/analytics" element={<Analytics />} />
-            <Route path="/profile" element={<Profile />} /> */}
           </Route>
 
-          {/* Protected Routes - Admin Only */}
+          {/* Protected Routes - Admin & SuperAdmin */}
           <Route 
             element={
               <ProtectedRoute>
@@ -45,38 +49,18 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            {/* <Route path="/admin/dashboard" element={<AdminDashboard />} />
-            <Route path="/admin/users" element={<Users />} />
-            <Route path="/admin/todo-moderation" element={<TodoModeration />} />
-            <Route path="/admin/reports" element={<Reports />} />
-            <Route path="/admin/audit-monitoring" element={<AuditMonitoring />} />
-            <Route path="/admin/profile" element={<AdminProfile />} /> */}
-          </Route>
-
-          {/* Protected Routes - SuperAdmin Only */}
-          <Route 
-            element={
-              <ProtectedRoute>
-                <RoleRoute allowedRoles={["SUPERADMIN"]}>
-                  <DashboardLayout />
-                </RoleRoute>
-              </ProtectedRoute>
-            }
-          >
-            {/* <Route path="/superadmin/dashboard" element={<SuperAdminDashboard />} />
-            <Route path="/superadmin/roles" element={<RoleManagement />} />
-            <Route path="/superadmin/settings" element={<SystemSettings />} />
-            <Route path="/superadmin/security" element={<SecurityCenter />} />
-            <Route path="/superadmin/audit-logs" element={<AuditLogs />} />
-            <Route path="/superadmin/data" element={<DataManagement />} />
-            <Route path="/superadmin/analytics" element={<PlatformAnalytics />} />
-            <Route path="/superadmin/emergency" element={<EmergencyActions />} />
-            <Route path="/superadmin/profile" element={<SuperAdminProfile />} /> */}
+            <Route path="/dashboard" element={<div className="p-6"><h1 className="text-2xl font-bold text-slate-900">Dashboard</h1></div>} />
+            {/* <Route path="/users" element={<Users />} />
+            <Route path="/todo-moderation" element={<TodoModeration />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/audit-monitoring" element={<AuditMonitoring />} />
+            <Route path="/profile" element={<AdminProfile />} /> */}
           </Route>
 
           {/* Unauthorized Page */}
           <Route path="/unauthorized" element={<Unauthorized />} />
         </Routes>
+
       </AuthProvider>
     </BrowserRouter>
   );

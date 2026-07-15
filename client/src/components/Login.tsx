@@ -60,8 +60,16 @@ export default function Login() {
       const res = await api.post("/login", data);
       const { user } = res.data;
 
-      login(user); 
-      navigate("/my-todo");
+      console.log("User from API:", user);
+      
+      login(user);
+
+      // Redirect based on role
+      if (user.role === "ADMIN" || user.role === "SUPERADMIN") {
+        navigate("/dashboard");
+      } else {
+        navigate("/my-todo");
+      }
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.status === 401) {
         setError("password", { message: "Invalid email or password" });
