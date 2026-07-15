@@ -25,13 +25,14 @@ export default function DashboardLayout() {
   const unreadCount = sampleNotifications.filter((n) => !n.read).length;
 
   // Select sidebar based on user role
-  let SidebarComponent;
+  // Select sidebar based on user role
+  const getSidebarComponent = () => {
+    if (user?.role === "SUPERADMIN") return SuperAdminSidebar;
+    if (user?.role === "ADMIN") return AdminSidebar;
+    return Sidebar;
+  };
 
-  if (user?.role === "SUPERADMIN") {
-    SidebarComponent = SuperAdminSidebar;
-  } else if (user?.role === "ADMIN") {
-    SidebarComponent = AdminSidebar;
-  } 
+  const SidebarComponent = getSidebarComponent();
 
   return (
     <div className="flex h-screen bg-slate-100">

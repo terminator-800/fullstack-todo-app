@@ -90,7 +90,7 @@ function Icon({ name }: { name: (typeof adminSidebarContent.navItems)[number]["i
   }
 }
 
-export default function AdminSidebar() {
+export default function SuperAdminSidebar() {  // ← correct
   const navigate = useNavigate();
   const user = useAuth((state) => state.user);
   const logout = useAuth((state) => state.logout);
