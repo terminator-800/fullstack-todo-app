@@ -1,8 +1,4 @@
-// src/pages/DashboardLayout.tsx
-import { useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Navbar from "../components/Navbar";
-import NotificationBar, { type Notification } from "../components/NotificationBar";
+// src/pages/MyTodoLayout.tsx
 
 // All page text lives here — edit this object to change any copy on the page
 const pageContent = {
@@ -27,22 +23,7 @@ const pageContent = {
   },
 } as const;
 
-// Placeholder data — replace with a real fetch (e.g. GET /notifications)
-// once that endpoint exists on the backend.
-const sampleNotifications: Notification[] = [
-  {
-    id: "1",
-    title: "Welcome to Ledger",
-    description: "Your account is set up and ready to go.",
-    time: "Just now",
-    read: false,
-  },
-];
-
 export default function MyTodoLayout() {
-  const [isNotifOpen, setIsNotifOpen] = useState(false);
-
-  const unreadCount = sampleNotifications.filter((n) => !n.read).length;
 
   return (
     <div className="flex h-screen bg-slate-100">
