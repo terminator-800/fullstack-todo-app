@@ -10,6 +10,7 @@ import PublicRoute from "./components/PublicRoute";
 import RoleRoute from "./components/RoleRoute";
 import AuthProvider from "./components/AuthProvider";
 import Unauthorized from "./components/Unauthorized";
+import Dashboard from "./components/Dashboard";
 
 export default function App() {
   return (
@@ -49,7 +50,7 @@ export default function App() {
               </ProtectedRoute>
             }
           >
-            <Route path="/dashboard" element={<div className="p-6"><h1 className="text-2xl font-bold text-slate-900">Dashboard</h1></div>} />
+            <Route path="/dashboard" element={<Dashboard />} />
             {/* <Route path="/users" element={<Users />} />
             <Route path="/todo-moderation" element={<TodoModeration />} />
             <Route path="/reports" element={<Reports />} />
