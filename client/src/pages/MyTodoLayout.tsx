@@ -1,4 +1,7 @@
 // src/pages/MyTodoLayout.tsx
+import { useState } from "react";
+import NewTodo from "../components/NewTodo";
+
 
 // All page text lives here — edit this object to change any copy on the page
 const pageContent = {
@@ -24,19 +27,13 @@ const pageContent = {
 } as const;
 
 export default function MyTodoLayout() {
+  const [isNewTodoOpen, setIsNewTodoOpen] = useState(false);
 
   return (
     <div className="flex h-screen bg-slate-100">
-      {/* <Sidebar /> */}
 
-      {/* min-w-0 lets the main column shrink properly inside the flex
-          container instead of overflowing when content is wide. */}
       <div className="flex min-w-0 flex-1 flex-col">
-        {/* <Navbar
-          onBellClick={() => setIsNotifOpen(true)}
-          notificationCount={unreadCount}
-        /> */}
-
+    
         <main className="flex-1 overflow-y-auto p-6">
           {/* Page header */}
           <div className="mb-4 flex items-start justify-between">
@@ -54,12 +51,13 @@ export default function MyTodoLayout() {
               >
                 {pageContent.buttons.archiveCompleted}
               </button>
-              <button
-                type="button"
-                className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 active:bg-emerald-900"
-              >
-                {pageContent.buttons.newTodo}
-              </button>
+                <button
+                    type="button"
+                    onClick={() => setIsNewTodoOpen(true)}
+                    className="rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-800 active:bg-emerald-900"
+                  >
+                    {pageContent.buttons.newTodo}
+                </button>
             </div>
           </div>
 
@@ -99,12 +97,16 @@ export default function MyTodoLayout() {
           </div>
         </main>
       </div>
+      
+        {/* New Todo Modal */}
+      <NewTodo
+        isOpen={isNewTodoOpen}
+        onClose={() => setIsNewTodoOpen(false)}
+        onSuccess={() => {
+          // TODO: refresh todo list after creation
+        }}
+      />
 
-      {/* <NotificationBar
-        isOpen={isNotifOpen}
-        onClose={() => setIsNotifOpen(false)}
-        notifications={sampleNotifications}
-      /> */}
     </div>
   );
 }
