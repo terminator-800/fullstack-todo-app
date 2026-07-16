@@ -36,6 +36,10 @@ model User {
 model Todo {
   id          String   @id @default(cuid())
   title       String
+  description String?
+  priority  String   @default("MEDIUM") // LOW, MEDIUM, HIGH
+  dueDate   DateTime?
+  tags      String[] @default([]) // array of strings
   completed   Boolean  @default(false)
 
   userId      String
