@@ -3,6 +3,7 @@ import cors from "cors";
 import authRoutes from "./routes/auth.routes";
 import cookieParser from "cookie-parser";
 import adminRoutes from "./routes/admin.routes";
+import todoRoutes from "./routes/todo.routes";
 
 const app = express();
 
@@ -22,5 +23,6 @@ app.get("/", (_req, res) => {
 
 app.use("/", authRoutes);
 app.use("/", adminRoutes);
+app.use("/", todoRoutes);
 
 export default app;
