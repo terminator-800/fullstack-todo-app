@@ -37,7 +37,6 @@ export function useCreateTodo(): UseCreateTodoResult {
     setError(null);
 
     try {
-      console.log("Payload being sent to /add-todos:", data);
       const res = await api.post("/add-todos", data);
       return res.data.todo;
     } catch (err) {
