@@ -4,9 +4,9 @@ import { createTodoSchema } from "../schemas/todo.schemas";
 import { fromError } from "zod-validation-error";
 
 export class TodoController {
+    
   async addTodo(req: Request, res: Response) {
-    console.log("addTodo called - user:", req.user); // Add this
-    console.log("Request body:", req.body); // Add this
+  
     const userId = req.user?.id;
 
     if (!userId) {
@@ -14,7 +14,6 @@ export class TodoController {
     }
 
     const parsed = createTodoSchema.safeParse(req.body);
-    console.log("Parsed result:", parsed); // Add this
 
     if (!parsed.success) {
       const validationError = fromError(parsed.error);
