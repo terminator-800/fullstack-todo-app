@@ -15,9 +15,9 @@ const pageContent = {
     dueDate: "Any due date",
     sort: "Sort: Newest",
     priorities: [
-      { label: "Low", dot: "bg-emerald-500" },
-      { label: "Medium", dot: "bg-amber-500" },
-      { label: "High", dot: "bg-red-500" },
+      { label: "Low", dot: "bg-emerald-500", value: "LOW" },      
+      { label: "Medium", dot: "bg-amber-500", value: "MEDIUM" },  
+      { label: "High", dot: "bg-red-500", value: "HIGH" },        
     ],
   },
   emptyState: {
@@ -26,9 +26,21 @@ const pageContent = {
   },
 } as const;
 
+type PriorityFilter = "LOW" | "MEDIUM" | "HIGH" | null;
+
 export default function MyTodoLayout() {
   const [isNewTodoOpen, setIsNewTodoOpen] = useState(false);
   const { todos, isLoading, error, refetch } = useGetTodos();
+
+  const [selectedPriority, setSelectedPriority] = useState<PriorityFilter>(null);
+
+  const handlePriorityClick = (value: PriorityFilter) => {
+    setSelectedPriority((prev) => (prev === value ? null : value));
+  };
+
+  const filteredTodos = selectedPriority
+    ? todos.filter((todo) => todo.priority === selectedPriority)
+    : todos;
 
   return (
     <>
@@ -75,7 +87,12 @@ export default function MyTodoLayout() {
               <button
                 key={p.label}
                 type="button"
-                className="flex items-center gap-1.5 rounded-full border border-slate-300 px-3 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50"
+                onClick={() => handlePriorityClick(p.value as PriorityFilter)}
+                className={`flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition ${
+                  selectedPriority === p.value
+                    ? "border-slate-700 bg-slate-900 text-white"  
+                    : "border-slate-300 text-slate-600 hover:bg-slate-50"
+                }`}
               >
                 <span className={`h-1.5 w-1.5 rounded-full ${p.dot}`} />
                 {p.label}
@@ -93,10 +110,11 @@ export default function MyTodoLayout() {
           <div className="flex min-h-[280px] items-center justify-center rounded-xl border border-slate-200 bg-white">
             <p className="text-sm text-red-500">{error}</p>
           </div>
-        ) : todos.length === 0 ? (
+        ) : filteredTodos.length === 0 ? (
           <div className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 text-center">
             <p className="font-serif text-lg font-bold text-slate-900">
-              {pageContent.emptyState.title}
+              {/* CHANGED: show different message when filter is active */}
+              {selectedPriority ? `No ${selectedPriority.toLowerCase()} priority todos` : pageContent.emptyState.title}
             </p>
             <p className="mt-1 text-sm text-emerald-700">
               {pageContent.emptyState.subtitle}
@@ -104,7 +122,7 @@ export default function MyTodoLayout() {
           </div>
         ) : (
           <div className="space-y-3">
-            {todos.map((todo) => (
+            {filteredTodos.map((todo) => (
               <TodoCard key={todo.id} todo={todo} />
             ))}
           </div>
