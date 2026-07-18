@@ -12,7 +12,13 @@ const pageContent = {
     newTodo: "+ New todo",
   },
   filters: {
-    dueDate: "Any due date",
+    dueDates: [
+      { label: "Any due date", value: null },
+      { label: "Today", value: "today" },
+      { label: "This week", value: "this-week" },
+      { label: "This month", value: "this-month" },
+      { label: "Overdue", value: "overdue" },
+    ],
     sort: "Sort: Newest",
     priorities: [
       { label: "Low", dot: "bg-emerald-500", value: "LOW" },      
@@ -27,20 +33,73 @@ const pageContent = {
 } as const;
 
 type PriorityFilter = "LOW" | "MEDIUM" | "HIGH" | null;
+type DueDateFilter = "today" | "this-week" | "this-month" | "overdue" | null;
+
+function matchesDueDate(dueDate: string | undefined, filter: DueDateFilter): boolean {
+  if (!filter) return true;
+  if (!dueDate) return false;
+ 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+ 
+  const due = new Date(dueDate);
+  due.setHours(0, 0, 0, 0);
+ 
+  if (filter === "today") {
+    return due.getTime() === today.getTime();
+  }
+ 
+  if (filter === "this-week") {
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - today.getDay());
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setDate(startOfWeek.getDate() + 6);
+    return due >= startOfWeek && due <= endOfWeek;
+  }
+ 
+  if (filter === "this-month") {
+    return (
+      due.getMonth() === today.getMonth() &&
+      due.getFullYear() === today.getFullYear()
+    );
+  }
+ 
+  if (filter === "overdue") {
+    return due < today;
+  }
+ 
+  return true;
+}
 
 export default function MyTodoLayout() {
   const [isNewTodoOpen, setIsNewTodoOpen] = useState(false);
   const { todos, isLoading, error, refetch } = useGetTodos();
 
   const [selectedPriority, setSelectedPriority] = useState<PriorityFilter>(null);
+  const [selectedDueDate, setSelectedDueDate] = useState<DueDateFilter>(null);
 
   const handlePriorityClick = (value: PriorityFilter) => {
     setSelectedPriority((prev) => (prev === value ? null : value));
   };
 
-  const filteredTodos = selectedPriority
-    ? todos.filter((todo) => todo.priority === selectedPriority)
-    : todos;
+  const filteredTodos = todos.filter((todo) => {
+    const matchesPriority = selectedPriority ? todo.priority === selectedPriority : true;
+    const matchesDate = matchesDueDate(todo.dueDate, selectedDueDate);
+    return matchesPriority && matchesDate;
+  });
+
+  const activeFilterLabel =
+    selectedPriority && selectedDueDate
+      ? `${selectedPriority.toLowerCase()} priority · ${selectedDueDate}`
+      : selectedPriority
+      ? `${selectedPriority.toLowerCase()} priority`
+      : selectedDueDate
+      ? selectedDueDate
+      : null;
+
+  // const filteredTodos = selectedPriority
+  //   ? todos.filter((todo) => todo.priority === selectedPriority)
+  //   : todos;
 
   return (
     <>
@@ -74,9 +133,21 @@ export default function MyTodoLayout() {
         {/* Filter row */}
         <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3">
           <div className="flex items-center gap-3">
-            <select className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20">
-              <option>{pageContent.filters.dueDate}</option>
+            {/* CHANGED: due date select now uses options from pageContent with onChange handler */}
+            <select
+              value={selectedDueDate ?? ""}
+              onChange={(e) =>
+                setSelectedDueDate((e.target.value as DueDateFilter) || null)
+              }
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+            >
+              {pageContent.filters.dueDates.map((d) => (
+                <option key={d.label} value={d.value ?? ""}>
+                  {d.label}
+                </option>
+              ))}
             </select>
+ 
             <select className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20">
               <option>{pageContent.filters.sort}</option>
             </select>
@@ -113,8 +184,9 @@ export default function MyTodoLayout() {
         ) : filteredTodos.length === 0 ? (
           <div className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 text-center">
             <p className="font-serif text-lg font-bold text-slate-900">
-              {/* CHANGED: show different message when filter is active */}
-              {selectedPriority ? `No ${selectedPriority.toLowerCase()} priority todos` : pageContent.emptyState.title}
+                {activeFilterLabel
+                ? `No todos matching "${activeFilterLabel}"`
+                : pageContent.emptyState.title}
             </p>
             <p className="mt-1 text-sm text-emerald-700">
               {pageContent.emptyState.subtitle}
