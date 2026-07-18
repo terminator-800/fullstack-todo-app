@@ -19,7 +19,10 @@ const pageContent = {
       { label: "This month", value: "this-month" },
       { label: "Overdue", value: "overdue" },
     ],
-    sort: "Sort: Newest",
+    sorts: [
+      { label: "Sort: Newest", value: "newest" },
+      { label: "Sort: Oldest", value: "oldest" },
+    ],
     priorities: [
       { label: "Low", dot: "bg-emerald-500", value: "LOW" },      
       { label: "Medium", dot: "bg-amber-500", value: "MEDIUM" },  
@@ -34,6 +37,7 @@ const pageContent = {
 
 type PriorityFilter = "LOW" | "MEDIUM" | "HIGH" | null;
 type DueDateFilter = "today" | "this-week" | "this-month" | "overdue" | null;
+type SortFilter = "newest" | "oldest";
 
 function matchesDueDate(dueDate: string | undefined, filter: DueDateFilter): boolean {
   if (!filter) return true;
@@ -77,16 +81,24 @@ export default function MyTodoLayout() {
 
   const [selectedPriority, setSelectedPriority] = useState<PriorityFilter>(null);
   const [selectedDueDate, setSelectedDueDate] = useState<DueDateFilter>(null);
-
+  const [selectedSort, setSelectedSort] = useState<SortFilter>("newest");
+  
   const handlePriorityClick = (value: PriorityFilter) => {
     setSelectedPriority((prev) => (prev === value ? null : value));
   };
 
-  const filteredTodos = todos.filter((todo) => {
-    const matchesPriority = selectedPriority ? todo.priority === selectedPriority : true;
-    const matchesDate = matchesDueDate(todo.dueDate, selectedDueDate);
-    return matchesPriority && matchesDate;
-  });
+   const filteredTodos = todos
+    .filter((todo) => {
+      const matchesPriority = selectedPriority ? todo.priority === selectedPriority : true;
+      const matchesDate = matchesDueDate(todo.dueDate, selectedDueDate);
+      return matchesPriority && matchesDate;
+    })
+    // ADDED: sort todos by createdAt based on selectedSort
+    .sort((a, b) => {
+      const dateA = new Date(a.createdAt).getTime();
+      const dateB = new Date(b.createdAt).getTime();
+      return selectedSort === "newest" ? dateB - dateA : dateA - dateB;
+    });
 
   const activeFilterLabel =
     selectedPriority && selectedDueDate
@@ -96,10 +108,6 @@ export default function MyTodoLayout() {
       : selectedDueDate
       ? selectedDueDate
       : null;
-
-  // const filteredTodos = selectedPriority
-  //   ? todos.filter((todo) => todo.priority === selectedPriority)
-  //   : todos;
 
   return (
     <>
@@ -148,8 +156,16 @@ export default function MyTodoLayout() {
               ))}
             </select>
  
-            <select className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20">
-              <option>{pageContent.filters.sort}</option>
+            <select
+              value={selectedSort}
+              onChange={(e) => setSelectedSort(e.target.value as SortFilter)}
+              className="rounded-lg border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-700 focus:border-emerald-600 focus:outline-none focus:ring-2 focus:ring-emerald-600/20"
+            >
+              {pageContent.filters.sorts.map((s) => (
+                <option key={s.value} value={s.value}>
+                  {s.label}
+                </option>
+              ))}
             </select>
           </div>
 
