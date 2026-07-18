@@ -1,4 +1,5 @@
 // src/cards/TodoCard.tsx
+import { useState } from "react";
 import type { Todo } from "../hooks/useGetTodos";
 
 interface TodoCardProps {
@@ -33,14 +34,15 @@ function formatDate(dateStr: string) {
 
 export default function TodoCard({ todo }: TodoCardProps) {
   const priority = priorityConfig[todo.priority];
+  const [isChecked, setIsChecked] = useState(todo.completed);
 
   return (
     <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 transition hover:shadow-sm">
       {/* Checkbox */}
       <input
         type="checkbox"
-        checked={todo.completed}
-        readOnly
+        checked={isChecked}
+        onChange={() => setIsChecked((prev) => !prev)}
         className="mt-0.5 h-4 w-4 cursor-pointer accent-emerald-700"
       />
 
@@ -48,20 +50,43 @@ export default function TodoCard({ todo }: TodoCardProps) {
       <div className="min-w-0 flex-1">
         <div className="flex items-start justify-between gap-4">
           <p
-            className={`text-sm font-semibold text-slate-900 ${
-              todo.completed ? "line-through text-slate-400" : ""
+            className={`text-sm font-semibold transition-colors ${
+              isChecked ? "line-through text-slate-400" : "text-slate-900"
             }`}
           >
             {todo.title}
           </p>
 
-          {/* Priority badge */}
-          <span
-            className={`shrink-0 flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${priority.badge}`}
-          >
-            <span className={`h-1.5 w-1.5 rounded-full ${priority.dot}`} />
-            {priority.label}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            {/* Priority badge */}
+            <span
+              className={`flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${priority.badge}`}
+            >
+              <span className={`h-1.5 w-1.5 rounded-full ${priority.dot}`} />
+              {priority.label}
+            </span>
+
+            {/* Edit button */}
+            <button
+              type="button"
+              className="rounded-lg border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+            >
+              <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
+                <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+
+            {/* Delete button */}
+            <button
+              type="button"
+              className="rounded-lg border border-slate-300 p-1.5 text-slate-500 transition hover:bg-red-50 hover:border-red-200 hover:text-red-600"
+            >
+              <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
+                <path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2m2 0v13a1 1 0 01-1 1H8a1 1 0 01-1-1V7h10z" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Description */}
