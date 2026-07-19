@@ -1,6 +1,7 @@
 // src/cards/TodoCard.tsx
 import { useState } from "react";
 import type { Todo } from "../hooks/useGetTodos";
+import { useToggleTodo } from "../hooks/useToggleTodo";
 
 interface TodoCardProps {
   todo: Todo;
@@ -37,6 +38,16 @@ function formatDate(dateStr: string) {
 export default function TodoCard({ todo, onEdit, onDelete }: TodoCardProps) {
   const priority = priorityConfig[todo.priority];
   const [isChecked, setIsChecked] = useState(todo.completed);
+  const { toggleTodo } = useToggleTodo();
+  
+  const handleCheck = async () => {
+    const newChecked = !isChecked;
+    setIsChecked(newChecked); 
+    const success = await toggleTodo(todo.id, newChecked);
+    if (!success) {
+      setIsChecked(isChecked); 
+    }
+  };
 
   return (
     <div className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 transition hover:shadow-sm">
@@ -44,7 +55,7 @@ export default function TodoCard({ todo, onEdit, onDelete }: TodoCardProps) {
       <input
         type="checkbox"
         checked={isChecked}
-        onChange={() => setIsChecked((prev) => !prev)}
+        onChange={handleCheck}
         className="mt-0.5 h-4 w-4 cursor-pointer accent-emerald-700"
       />
 
