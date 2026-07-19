@@ -5,6 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { newTodoSchema, type NewTodoFormValues } from "../schemas/todoSchema";
 import { useEditTodo } from "../hooks/useEditTodo";
 import type { Todo } from "../hooks/useGetTodos";
+import { formatDateForInput } from "../helpers/formatDateForInput";
 
 const editTodoContent = {
   heading: "Edit todo",
@@ -65,7 +66,7 @@ export default function EditTodo({ isOpen, onClose, onSuccess, todo }: EditTodoP
         title: todo.title,
         description: todo.description ?? "",
         priority: todo.priority,
-        dueDate: todo.dueDate ?? "",
+        dueDate: formatDateForInput(todo.dueDate),
       });
       setTags(todo.tags ?? []);
       setTagInput("");
