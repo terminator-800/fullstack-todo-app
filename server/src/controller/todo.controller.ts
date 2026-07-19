@@ -110,6 +110,39 @@ export class TodoController {
       return res.status(500).json({ message: "Something went wrong. Try again." });
     }
   }
+
+  async deleteTodo(req: Request, res: Response) {
+    const userId = req.user?.id;
+    const { id } = req.params as { id: string };
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // Check if todo exists and belongs to user
+      const existingTodo = await prisma.todo.findUnique({
+        where: { id },
+      });
+
+      if (!existingTodo) {
+        return res.status(404).json({ message: "Todo not found" });
+      }
+
+      if (existingTodo.userId !== userId) {
+        return res.status(403).json({ message: "You do not have permission to delete this todo" });
+      }
+
+      await prisma.todo.delete({
+        where: { id },
+      });
+
+      return res.status(200).json({ message: "Todo deleted successfully" });
+    } catch (error) {
+      console.error("Delete todo error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
 }
 
 export const todoController = new TodoController();
