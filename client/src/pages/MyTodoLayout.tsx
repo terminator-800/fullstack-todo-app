@@ -1,8 +1,10 @@
 // src/pages/MyTodoLayout.tsx
 import { useState } from "react";
 import NewTodo from "../components/NewTodo";
+import EditTodo from "../components/EditTodo";
 import TodoCard from "../cards/TodoCard";
 import { useGetTodos } from "../hooks/useGetTodos";
+import type { Todo } from "../hooks/useGetTodos";
 
 const pageContent = {
   title: "My Todos",
@@ -83,11 +85,21 @@ export default function MyTodoLayout() {
   const [selectedDueDate, setSelectedDueDate] = useState<DueDateFilter>(null);
   const [selectedSort, setSelectedSort] = useState<SortFilter>("newest");
   
+  const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+
   const handlePriorityClick = (value: PriorityFilter) => {
     setSelectedPriority((prev) => (prev === value ? null : value));
   };
 
-   const filteredTodos = todos
+  const handleEdit = (todo: Todo) => {
+    setSelectedTodo(todo);
+  };
+
+   const handleEditClose = () => {
+    setSelectedTodo(null);
+  };
+
+  const filteredTodos = todos
     .filter((todo) => {
       const matchesPriority = selectedPriority ? todo.priority === selectedPriority : true;
       const matchesDate = matchesDueDate(todo.dueDate, selectedDueDate);
@@ -211,7 +223,7 @@ export default function MyTodoLayout() {
         ) : (
           <div className="space-y-3">
             {filteredTodos.map((todo) => (
-              <TodoCard key={todo.id} todo={todo} />
+              <TodoCard key={todo.id} todo={todo} onEdit={handleEdit} />
             ))}
           </div>
         )}
@@ -223,6 +235,18 @@ export default function MyTodoLayout() {
         onClose={() => setIsNewTodoOpen(false)}
         onSuccess={() => refetch()}
       />
+
+       {selectedTodo && (
+        <EditTodo
+          isOpen={!!selectedTodo}
+          onClose={handleEditClose}
+          onSuccess={() => {
+            refetch();
+            handleEditClose();
+          }}
+          todo={selectedTodo}
+        />
+      )}
     </>
   );
 }
