@@ -2,6 +2,7 @@
 import { useState } from "react";
 import NewTodo from "../components/NewTodo";
 import EditTodo from "../components/EditTodo";
+import DeleteTodo from "../components/DeleteTodo";
 import TodoCard from "../cards/TodoCard";
 import { useGetTodos } from "../hooks/useGetTodos";
 import type { Todo } from "../hooks/useGetTodos";
@@ -84,8 +85,8 @@ export default function MyTodoLayout() {
   const [selectedPriority, setSelectedPriority] = useState<PriorityFilter>(null);
   const [selectedDueDate, setSelectedDueDate] = useState<DueDateFilter>(null);
   const [selectedSort, setSelectedSort] = useState<SortFilter>("newest");
-  
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
+  const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
 
   const handlePriorityClick = (value: PriorityFilter) => {
     setSelectedPriority((prev) => (prev === value ? null : value));
@@ -97,6 +98,14 @@ export default function MyTodoLayout() {
 
    const handleEditClose = () => {
     setSelectedTodo(null);
+  };
+
+  const handleDelete = (todo: Todo) => {
+    setTodoToDelete(todo);
+  };
+
+  const handleDeleteClose = () => {
+    setTodoToDelete(null);
   };
 
   const filteredTodos = todos
@@ -222,8 +231,13 @@ export default function MyTodoLayout() {
           </div>
         ) : (
           <div className="space-y-3">
-            {filteredTodos.map((todo) => (
-              <TodoCard key={todo.id} todo={todo} onEdit={handleEdit} />
+             {filteredTodos.map((todo) => (
+              <TodoCard
+                key={todo.id}
+                todo={todo}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+              />
             ))}
           </div>
         )}
@@ -236,7 +250,7 @@ export default function MyTodoLayout() {
         onSuccess={() => refetch()}
       />
 
-       {selectedTodo && (
+      {selectedTodo && (
         <EditTodo
           isOpen={!!selectedTodo}
           onClose={handleEditClose}
@@ -245,6 +259,18 @@ export default function MyTodoLayout() {
             handleEditClose();
           }}
           todo={selectedTodo}
+        />
+      )}
+
+      {todoToDelete && (
+        <DeleteTodo
+          isOpen={!!todoToDelete}
+          onClose={handleDeleteClose}
+          onSuccess={() => {
+            refetch();
+            handleDeleteClose();
+          }}
+          todo={todoToDelete}
         />
       )}
     </>

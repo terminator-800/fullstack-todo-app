@@ -5,6 +5,7 @@ import type { Todo } from "../hooks/useGetTodos";
 interface TodoCardProps {
   todo: Todo;
   onEdit: (todo: Todo) => void;
+  onDelete: (todo: Todo) => void;
 }
 
 const priorityConfig = {
@@ -33,7 +34,7 @@ function formatDate(dateStr: string) {
   });
 }
 
-export default function TodoCard({ todo, onEdit  }: TodoCardProps) {
+export default function TodoCard({ todo, onEdit, onDelete }: TodoCardProps) {
   const priority = priorityConfig[todo.priority];
   const [isChecked, setIsChecked] = useState(todo.completed);
 
@@ -80,8 +81,9 @@ export default function TodoCard({ todo, onEdit  }: TodoCardProps) {
             </button>
 
             {/* Delete button */}
-            <button
+             <button
               type="button"
+              onClick={() => onDelete(todo)}
               className="rounded-lg border border-slate-300 p-1.5 text-slate-500 transition hover:bg-red-50 hover:border-red-200 hover:text-red-600"
             >
               <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
