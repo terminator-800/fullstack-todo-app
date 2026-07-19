@@ -11,5 +11,6 @@ router.post("/add-todos", requireAuth, requireRole([Role.USER]), todoController.
 router.get("/todos", requireAuth, requireRole([Role.USER]), todoController.getTodos.bind(todoController));
 router.put("/todos/:id", requireAuth, requireRole([Role.USER]), todoController.editTodo.bind(todoController));
 router.delete("/todos/:id", requireAuth, requireRole([Role.USER]), todoController.deleteTodo.bind(todoController));
+router.patch("/todos/:id/complete", requireAuth, requireRole([Role.USER]), todoController.toggleTodo.bind(todoController));
 
 export default router;
