@@ -61,6 +61,55 @@ export class TodoController {
       return res.status(500).json({ message: "Something went wrong. Try again." });
     }
   }
+
+  async editTodo(req: Request, res: Response) {
+    const userId = req.user?.id;
+    const { id } = req.params as { id: string };
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const parsed = createTodoSchema.safeParse(req.body);
+
+    if (!parsed.success) {
+      const validationError = fromError(parsed.error);
+      return res.status(400).json({ message: validationError.toString() });
+    }
+
+    try {
+      // Check if todo exists and belongs to user
+      const existingTodo = await prisma.todo.findUnique({
+        where: { id },
+      });
+
+      if (!existingTodo) {
+        return res.status(404).json({ message: "Todo not found" });
+      }
+
+      if (existingTodo.userId !== userId) {
+        return res.status(403).json({ message: "You do not have permission to edit this todo" });
+      }
+
+      const { title, description, priority, dueDate, tags } = parsed.data;
+
+      const updatedTodo = await prisma.todo.update({
+        where: { id },
+        data: {
+          title,
+          description: description || null,
+          priority,
+          dueDate: dueDate ? new Date(dueDate) : null,
+          tags: tags || [],
+        },
+      });
+
+      return res.status(200).json({ todo: updatedTodo });
+    } catch (error) {
+      console.error("Edit todo error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
 }
 
 export const todoController = new TodoController();

@@ -9,5 +9,6 @@ const router = Router();
 
 router.post("/add-todos", requireAuth, requireRole([Role.USER]), todoController.addTodo.bind(todoController));
 router.get("/todos", requireAuth, requireRole([Role.USER]), todoController.getTodos.bind(todoController));
+router.put("/todos/:id", requireAuth, requireRole([Role.USER]), todoController.editTodo.bind(todoController));
 
 export default router;
