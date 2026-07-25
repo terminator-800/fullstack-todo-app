@@ -11,6 +11,7 @@ import RoleRoute from "./components/RoleRoute";
 import AuthProvider from "./components/AuthProvider";
 import Unauthorized from "./components/Unauthorized";
 import Dashboard from "./components/Dashboard";
+import ArchiveLayout from "./pages/ArchiveLayout";
 
 export default function App() {
   return (
@@ -38,6 +39,7 @@ export default function App() {
             }
           >
             <Route path="/my-todo" element={<MyTodoLayout />} />
+            <Route path="/archive" element={<ArchiveLayout />} />
           </Route>
 
           {/* Protected Routes - Admin & SuperAdmin */}
