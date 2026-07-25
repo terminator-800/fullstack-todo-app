@@ -56,10 +56,10 @@ export default function ArchiveLayout() {
             return (
               <div
                 key={todo.id}
-                className="flex items-start gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 transition hover:shadow-sm"
+                className="relative flex items-start gap-4 rounded-xl border border-slate-200 bg-white px-5 py-4 transition hover:shadow-sm"
               >
                 {/* Left accent bar */}
-                <div className="absolute left-0 h-full w-1 rounded-l-xl bg-emerald-600" />
+                <div className="absolute left-0 top-0 h-full w-1 rounded-l-xl bg-emerald-600" />
 
                 {/* Number + Checkbox */}
                 <div className="flex items-center gap-2 shrink-0">
