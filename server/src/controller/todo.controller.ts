@@ -182,6 +182,92 @@ export class TodoController {
       return res.status(500).json({ message: "Something went wrong. Try again." });
     }
   }
+
+  async archiveCompleted(req: Request, res: Response) {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      // ADDED: Update all completed todos to archived for logged in user
+      const result = await prisma.todo.updateMany({
+        where: {
+          userId,
+          completed: true,
+        },
+        data: {
+          archived: true,
+        },
+      });
+
+      return res.status(200).json({ message: `${result.count} todos archived` });
+    } catch (error) {
+      console.error("Archive completed error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
+
+  async getArchived(req: Request, res: Response) {
+    const userId = req.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const todos = await prisma.todo.findMany({
+        where: {
+          userId,
+          archived: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      return res.status(200).json({ todos });
+    } catch (error) {
+      console.error("Get archived error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
+
+  async restoreTodo(req: Request, res: Response) {
+    const userId = req.user?.id;
+    const { id } = req.params as { id: string };
+
+    if (!userId) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+      const existingTodo = await prisma.todo.findUnique({
+        where: { id },
+      });
+
+      if (!existingTodo) {
+        return res.status(404).json({ message: "Todo not found" });
+      }
+
+      if (existingTodo.userId !== userId) {
+        return res.status(403).json({ message: "You do not have permission to restore this todo" });
+      }
+
+      // ADDED: Set archived and completed to false on restore
+      const restoredTodo = await prisma.todo.update({
+        where: { id },
+        data: {
+          archived: false,
+          completed: false,
+        },
+      });
+
+      return res.status(200).json({ todo: restoredTodo });
+    } catch (error) {
+      console.error("Restore todo error:", error);
+      return res.status(500).json({ message: "Something went wrong. Try again." });
+    }
+  }
 }
 
 export const todoController = new TodoController();
