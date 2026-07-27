@@ -1,4 +1,6 @@
 // src/pages/ArchiveLayout.tsx
+import { useGetArchivedTodos } from "../hooks/useGetArchivedTodos";
+
 const pageContent = {
   title: "Archive",
   subtitle: "Completed tasks you have tucked away.",
@@ -8,26 +10,23 @@ const pageContent = {
   },
 } as const;
 
-// Placeholder archived todos — replace with real fetch later
-const archivedTodos = [
-  {
-    id: "1",
-    number: "No.001",
-    title: "123",
-    description: "12312",
-    priority: "MEDIUM" as const,
-    dueDate: "Jul 22",
-    completed: true,
-  },
-];
-
 const priorityConfig = {
   LOW: { label: "Low", color: "bg-emerald-600 text-white" },
   MEDIUM: { label: "Medium", color: "bg-amber-500 text-white" },
   HIGH: { label: "High", color: "bg-red-500 text-white" },
 } as const;
 
+function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
 export default function ArchiveLayout() {
+  const { todos, isLoading, error } = useGetArchivedTodos();
+
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -39,7 +38,15 @@ export default function ArchiveLayout() {
       </div>
 
       {/* Archive list */}
-      {archivedTodos.length === 0 ? (
+      {isLoading ? (
+        <div className="flex min-h-[280px] items-center justify-center rounded-xl border border-slate-200 bg-white">
+          <p className="text-sm text-slate-400">Loading archived todos...</p>
+        </div>
+      ) : error ? (
+        <div className="flex min-h-[280px] items-center justify-center rounded-xl border border-slate-200 bg-white">
+          <p className="text-sm text-red-500">{error}</p>
+        </div>
+      ) : todos.length === 0 ? (
         <div className="flex min-h-[280px] flex-col items-center justify-center rounded-xl border border-slate-200 bg-white px-6 py-16 text-center">
           <p className="font-serif text-lg font-bold text-slate-900">
             {pageContent.emptyState.title}
@@ -50,8 +57,8 @@ export default function ArchiveLayout() {
         </div>
       ) : (
         <div className="space-y-3">
-          {archivedTodos.map((todo) => {
-            const priority = priorityConfig[todo.priority];
+          {todos.map((todo, index) => {
+            const priority = priorityConfig[todo.priority as keyof typeof priorityConfig] ?? priorityConfig.MEDIUM;
 
             return (
               <div
@@ -64,7 +71,7 @@ export default function ArchiveLayout() {
                 {/* Number + Checkbox */}
                 <div className="flex items-center gap-2 shrink-0">
                   <span className="text-xs font-medium text-slate-400">
-                    {todo.number}
+                    No.{String(index + 1).padStart(3, "0")}
                   </span>
                   <div className="flex h-5 w-5 items-center justify-center rounded bg-emerald-700">
                     <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5 text-white">
@@ -93,7 +100,7 @@ export default function ArchiveLayout() {
                           <rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" strokeWidth={2} />
                           <path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" strokeWidth={2} strokeLinecap="round" />
                         </svg>
-                        {todo.dueDate}
+                        {formatDate(todo.dueDate)}
                       </span>
                     )}
                   </div>
