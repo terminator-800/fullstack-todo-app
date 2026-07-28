@@ -51,7 +51,7 @@ export class TodoController {
 
     try {
       const todos = await prisma.todo.findMany({
-        where: { userId },
+        where: { userId, archived: false, },
         orderBy: { createdAt: "desc" },
       });
 
