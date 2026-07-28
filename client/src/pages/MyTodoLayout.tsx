@@ -6,12 +6,14 @@ import DeleteTodo from "../components/DeleteTodo";
 import TodoCard from "../cards/TodoCard";
 import { useGetTodos } from "../hooks/useGetTodos";
 import type { Todo } from "../hooks/useGetTodos";
+import { useArchiveCompleted } from "../hooks/useArchiveCompleted"; // ADDED: import useArchiveCompleted
 
 const pageContent = {
   title: "My Todos",
   subtitle: "Everything on your plate right now.",
   buttons: {
     archiveCompleted: "Archive completed",
+    archiveCompletedLoading: "Archiving...", 
     newTodo: "+ New todo",
   },
   filters: {
@@ -88,24 +90,22 @@ export default function MyTodoLayout() {
   const [selectedTodo, setSelectedTodo] = useState<Todo | null>(null);
   const [todoToDelete, setTodoToDelete] = useState<Todo | null>(null);
 
+  const { archiveCompleted, isLoading: isArchiving } = useArchiveCompleted();
+
   const handlePriorityClick = (value: PriorityFilter) => {
     setSelectedPriority((prev) => (prev === value ? null : value));
   };
 
-  const handleEdit = (todo: Todo) => {
-    setSelectedTodo(todo);
-  };
+  const handleEdit = (todo: Todo) => setSelectedTodo(todo);
+  const handleEditClose = () => setSelectedTodo(null);
+  const handleDelete = (todo: Todo) => setTodoToDelete(todo);
+  const handleDeleteClose = () => setTodoToDelete(null);
 
-   const handleEditClose = () => {
-    setSelectedTodo(null);
-  };
-
-  const handleDelete = (todo: Todo) => {
-    setTodoToDelete(todo);
-  };
-
-  const handleDeleteClose = () => {
-    setTodoToDelete(null);
+  const handleArchiveCompleted = async () => {
+    const success = await archiveCompleted();
+    if (success) {
+      refetch();
+    }
   };
 
   const filteredTodos = todos
@@ -145,9 +145,13 @@ export default function MyTodoLayout() {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100"
+              onClick={handleArchiveCompleted}
+              disabled={isArchiving}
+              className="rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 active:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {pageContent.buttons.archiveCompleted}
+              {isArchiving
+                ? pageContent.buttons.archiveCompletedLoading
+                : pageContent.buttons.archiveCompleted}
             </button>
             <button
               type="button"
