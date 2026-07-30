@@ -1,5 +1,6 @@
 // src/pages/ArchiveLayout.tsx
 import { useGetArchivedTodos } from "../hooks/useGetArchivedTodos";
+import { useRestoreTodo } from "../hooks/useRestoreTodo"; 
 
 const pageContent = {
   title: "Archive",
@@ -26,7 +27,15 @@ function formatDate(dateStr: string) {
 
 export default function ArchiveLayout() {
   const { todos, isLoading, error } = useGetArchivedTodos();
+  const { restoreTodo, isLoading: isRestoring } = useRestoreTodo();
 
+  const handleRestore = async (id: string) => {
+    const success = await restoreTodo(id);
+    if (success) {
+      refetch();
+    }
+  };
+  
   return (
     <div className="space-y-6">
       {/* Page header */}
