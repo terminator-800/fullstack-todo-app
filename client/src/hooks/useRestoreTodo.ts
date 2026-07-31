@@ -8,7 +8,7 @@ interface UseRestoreTodoResult {
   error: string | null;
 }
 
-export function useRestoreTodo(): UseRestoreTodoResult {
+export function useRestoreTodo(onSuccess?: () => void): UseRestoreTodoResult {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -18,6 +18,7 @@ export function useRestoreTodo(): UseRestoreTodoResult {
 
     try {
       await api.patch(`/todos/${id}/restore`);
+      onSuccess?.(); 
       return true;
     } catch (err) {
       setError("Failed to restore todo. Please try again.");

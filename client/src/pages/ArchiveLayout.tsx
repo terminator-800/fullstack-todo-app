@@ -26,16 +26,9 @@ function formatDate(dateStr: string) {
 }
 
 export default function ArchiveLayout() {
-  const { todos, isLoading, error } = useGetArchivedTodos();
-  const { restoreTodo, isLoading: isRestoring } = useRestoreTodo();
+  const { todos, isLoading, error, refetch } = useGetArchivedTodos();
+  const { restoreTodo, isLoading: isRestoring } = useRestoreTodo(refetch);
 
-  const handleRestore = async (id: string) => {
-    const success = await restoreTodo(id);
-    if (success) {
-      refetch();
-    }
-  };
-  
   return (
     <div className="space-y-6">
       {/* Page header */}
@@ -120,7 +113,9 @@ export default function ArchiveLayout() {
                   {/* Restore button */}
                   <button
                     type="button"
-                    className="rounded-lg border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700"
+                    onClick={() => restoreTodo(todo.id)}
+                    disabled={isRestoring}
+                    className="rounded-lg border border-slate-300 p-1.5 text-slate-500 transition hover:bg-slate-50 hover:text-slate-700 disabled:opacity-50"
                   >
                     <svg viewBox="0 0 24 24" fill="none" className="h-3.5 w-3.5">
                       <path d="M1 4v6h6" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
